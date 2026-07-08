@@ -25,55 +25,104 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const useCloudinary =
-  process.env.CLOUDINARY_CLOUD_NAME &&
-  process.env.CLOUDINARY_API_KEY &&
-  process.env.CLOUDINARY_API_SECRET;
-
 let cloudinary;
 
-if (useCloudinary) {
-  cloudinary = require("cloudinary").v2;
-  cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-  });
-  console.log("Image uploads: Cloudinary");
-} else {
-  const uploadsDir = path.join(rootDir, "uploads");
-  if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
+function isCloudinaryConfigured() {
+  if (process.env.CLOUDINARY_URL?.trim()) {
+    return true;
   }
-  console.log("Image uploads: local uploads/ folder");
+
+  return !!(
+    process.env.CLOUDINARY_CLOUD_NAME?.trim() &&
+    process.env.CLOUDINARY_API_KEY?.trim() &&
+    process.env.CLOUDINARY_API_SECRET?.trim()
+  );
 }
 
-const storage = useCloudinary
-  ? multer.memoryStorage()
-  : multer.diskStorage({
-      destination: (req, file, cb) => {
-        cb(null, path.join(rootDir, "uploads"));
-      },
-      filename: (req, file, cb) => {
-        cb(null, randomString(10) + "_" + file.originalname);
-      },
-    });
+function getCloudinary() {
+  if (!cloudinary) {
+    cloudinary = require("cloudinary").v2;
+
+    if (process.env.CLOUDINARY_URL?.trim()) {
+      cloudinary.config();
+    } else {
+      cloudinary.config({
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME.trim(),
+        api_key: process.env.CLOUDINARY_API_KEY.trim(),
+        api_secret: process.env.CLOUDINARY_API_SECRET.trim(),
+      });
+    }
+  }
+
+  return cloudinary;
+}
+
+function logUploadConfig() {
+  if (isCloudinaryConfigured()) {
+    const source = process.env.CLOUDINARY_URL?.trim()
+      ? "CLOUDINARY_URL"
+      : "CLOUDINARY_CLOUD_NAME + API_KEY + API_SECRET";
+    console.log(`Image uploads: Cloudinary (${source})`);
+    return;
+  }
+
+  console.log("Image uploads: local uploads/ folder");
+  console.warn(
+    "Cloudinary is NOT configured. Set CLOUDINARY_URL or all three CLOUDINARY_* vars on Render."
+  );
+
+  if (!process.env.CLOUDINARY_CLOUD_NAME?.trim()) {
+    console.warn("Missing: CLOUDINARY_CLOUD_NAME");
+  }
+  if (!process.env.CLOUDINARY_API_KEY?.trim()) {
+    console.warn("Missing: CLOUDINARY_API_KEY");
+  }
+  if (!process.env.CLOUDINARY_API_SECRET?.trim()) {
+    console.warn("Missing: CLOUDINARY_API_SECRET");
+  }
+}
 
 const multerUpload = multer({
-  storage,
+  storage: multer.memoryStorage(),
   fileFilter,
   limits: { fileSize: 5 * 1024 * 1024 },
 }).single("photo");
 
-async function uploadToCloudinary(file) {
+async function saveLocalPhoto(file) {
+  const uploadsDir = path.join(rootDir, "uploads");
+
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  }
+
+  const filename = randomString(10) + "_" + file.originalname;
+  const filePath = path.join(uploadsDir, filename);
+
+  await fs.promises.writeFile(filePath, file.buffer);
+
+  return {
+    url: `/uploads/${filename}`,
+    publicId: filename,
+  };
+}
+
+async function saveCloudinaryPhoto(file) {
   const dataUri = `data:${file.mimetype};base64,${file.buffer.toString("base64")}`;
-  return cloudinary.uploader.upload(dataUri, { folder: "homenest" });
+  const result = await getCloudinary().uploader.upload(dataUri, {
+    folder: "homenest",
+  });
+
+  return {
+    url: result.secure_url,
+    publicId: result.public_id,
+  };
 }
 
 function upload(req, res, next) {
   const isHomeForm =
     req.method === "POST" &&
-    (req.path.endsWith("/add-home") || req.path.endsWith("/edit-home"));
+    (req.originalUrl.includes("/add-home") ||
+      req.originalUrl.includes("/edit-home"));
 
   if (!isHomeForm) {
     return next();
@@ -84,20 +133,27 @@ function upload(req, res, next) {
       return next(err);
     }
 
-    if (!useCloudinary || !req.file) {
+    if (!req.file) {
       return next();
     }
 
     try {
-      const result = await uploadToCloudinary(req.file);
-      req.file.path = result.secure_url;
-      req.file.filename = result.public_id;
+      const saved = isCloudinaryConfigured()
+        ? await saveCloudinaryPhoto(req.file)
+        : await saveLocalPhoto(req.file);
+
+      req.file.path = saved.url;
+      req.file.filename = saved.publicId;
       next();
     } catch (uploadError) {
-      console.error("Cloudinary upload failed:", uploadError);
+      console.error("Photo upload failed:", uploadError);
       next(uploadError);
     }
   });
 }
 
-module.exports = { upload, useCloudinary };
+module.exports = {
+  upload,
+  isCloudinaryConfigured,
+  logUploadConfig,
+};

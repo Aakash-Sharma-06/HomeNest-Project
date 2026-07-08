@@ -13,10 +13,12 @@ const storeRouter=require("./routes/storerouter");
 const hostRouter=require("./routes/hostRouter");
 const authRouter=require("./routes/authRouter");
 const rootDir=require("./utils/pathutil");
-const { upload, useCloudinary } = require("./utils/multerConfig");
+const { upload, isCloudinaryConfigured, logUploadConfig } = require("./utils/multerConfig");
 const errorsController= require("./controllers/errors");
 
 const app=express();
+
+logUploadConfig();
 
 app.set('view engine','ejs');
 app.set('views','views');
@@ -31,7 +33,7 @@ app.use(express.urlencoded());
 app.use(upload);
 app.use(express.static(path.join(rootDir,'public')));
 
-if (!useCloudinary) {
+if (!isCloudinaryConfigured()) {
     app.use("/uploads",express.static(path.join(rootDir,'uploads')));
     app.use("/host/uploads/",express.static(path.join(rootDir,'uploads')));
     app.use("/homes/uploads/",express.static(path.join(rootDir,'uploads')));

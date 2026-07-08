@@ -1,10 +1,13 @@
 const fs = require("fs");
 const path = require("path");
 
-const useCloudinary =
-  process.env.CLOUDINARY_CLOUD_NAME &&
-  process.env.CLOUDINARY_API_KEY &&
-  process.env.CLOUDINARY_API_SECRET;
+const useCloudinary = () =>
+  !!(
+    process.env.CLOUDINARY_URL?.trim() ||
+    (process.env.CLOUDINARY_CLOUD_NAME?.trim() &&
+      process.env.CLOUDINARY_API_KEY?.trim() &&
+      process.env.CLOUDINARY_API_SECRET?.trim())
+  );
 
 function getPhotoUrl(file) {
   if (!file) return null;
@@ -21,7 +24,7 @@ async function deletePhoto(photoPath) {
   if (!photoPath) return;
 
   if (photoPath.startsWith("http")) {
-    if (!useCloudinary) return;
+    if (!useCloudinary()) return;
 
     const cloudinary = require("cloudinary").v2;
     const publicId = photoPath.split("/upload/")[1]?.replace(/^v\d+\//, "");
