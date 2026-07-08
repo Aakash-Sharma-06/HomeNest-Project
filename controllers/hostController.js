@@ -8,7 +8,7 @@ function getHostId(req) {
 exports.getAddHome = (req, res, next) => {
     res.render('Host/edit-home',{
         home: {},
-        pageTitle: 'Add Home to Airbnb',
+        pageTitle: 'Add Home to HomeNest',
          currentPage: 'addHome',
          editing:false,
          isLoggedIn: req.isLoggedIn,
@@ -28,7 +28,7 @@ exports.getEditHome = (req, res, next) => {
         }
         res.render('Host/edit-home',{
         home:home,
-        pageTitle: 'Edit Home in Airbnb', 
+        pageTitle: 'Edit Home in HomeNest', 
         currentPage: 'Host-home',
         editing:editing,
          isLoggedIn: req.isLoggedIn,
