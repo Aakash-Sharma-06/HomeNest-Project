@@ -1,8 +1,8 @@
-# HomeNest Project (Airbnb Clone)
+# HomeNest — Full-Stack Property Rental Marketplace
 
-This is a web application built using the MVC architecture with **Node.js, Express, EJS, and Mongoose (MongoDB)**. I developed this project to learn how full-stack Node.js applications work, including user authentication, file uploads, sessions, and database integrations.
+HomeNest is a multi-role, full-stack rental platform built using Node.js, Express, EJS, and Mongoose (MongoDB). 
 
-It is styled using **Tailwind CSS**.
+Rather than just copying features, this project was built to master production-grade backend practices including MVC architecture pattern, relational database designs, session management, secure credential handling, and local storage pipelines.
 
 ---
 
