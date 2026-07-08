@@ -138,6 +138,12 @@ function upload(req, res, next) {
     }
 
     try {
+      if (process.env.RENDER && !isCloudinaryConfigured()) {
+        throw new Error(
+          "Cloudinary is required on Render. Add CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET in Environment."
+        );
+      }
+
       const saved = isCloudinaryConfigured()
         ? await saveCloudinaryPhoto(req.file)
         : await saveLocalPhoto(req.file);
