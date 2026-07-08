@@ -4,6 +4,7 @@ const fs= require("fs");
 
 exports.getAddHome = (req, res, next) => {
     res.render('Host/edit-home',{
+        home: {},
         pageTitle: 'Add Home to Airbnb',
          currentPage: 'addHome',
          editing:false,
