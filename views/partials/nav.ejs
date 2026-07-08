@@ -1,0 +1,39 @@
+
+<nav class="bg-blue-600 px-8 py-4 flex items-center shadow-md">
+    <a href="/" class="text-white text-2xl font-bold">HomeNest</a>
+
+
+    <% if (isLoggedIn) { %>
+    <% if (!user || !user.usertype || user.usertype === 'guest') { %>
+    <div class="flex gap-6 ml-8">
+        <a href="/homes" class="text-white text-base font-medium px-3 py-2 rounded hover:bg-white/20 transition-colors">Home</a>
+        <a href="/favourites" class="text-white text-base font-medium px-3 py-2 rounded hover:bg-white/20 transition-colors">Favourites</a>
+        <a href="/bookings" class="text-white text-base font-medium px-3 py-2 rounded hover:bg-white/20 transition-colors">Bookings</a>
+    </div>
+<% } else if (user.usertype === 'host') { %>
+    <div class="flex gap-6 ml-8">
+        <a href="/host/add-home" class="text-white text-base font-medium px-3 py-2 rounded hover:bg-white/20 transition-colors">Add Home</a>
+        <a href="/host/host-home-list" class="text-white text-base font-medium px-3 py-2 rounded hover:bg-white/20 transition-colors">Host Home List</a>
+    </div>
+<% } %>
+
+    <% } %>
+
+
+    <% if (!isLoggedIn) { %>
+    <div class="ml-auto flex gap-4">
+        <form action="/signup" method="GET" class="inline">
+            <button type="submit" class="text-white text-base font-medium px-3 py-2 rounded hover:bg-white/20 transition-colors">Signup</button>
+        </form>
+        <form action="/login" method="GET" class="inline">
+            <button type="submit" class="text-white text-base font-medium px-3 py-2 rounded hover:bg-white/20 transition-colors">Login</button>
+        </form>
+    </div>
+    <% } else { %>
+    <div class="ml-auto">
+        <form action="/logout" method="POST" class="inline">
+            <button type="submit" class="text-white text-base font-medium px-3 py-2 rounded hover:bg-white/20 transition-colors">Logout</button>
+        </form>
+    </div>
+    <% } %>
+</nav>

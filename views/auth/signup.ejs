@@ -1,0 +1,63 @@
+<%- include('../partials/head') %>
+<%- include('../partials/nav') %>
+
+
+<body class="min-h-screen bg-slate-100 text-slate-900">
+        <header class="bg-blue-600 text-white py-6 px-4 text-center">
+            <h1 class="m-0 text-xl font-semibold">Create Account</h1>
+        </header>
+        <main class="container mx-auto mt-8 p-10">
+            <section class="w-full max-w-xl bg-white p-8 rounded-3xl shadow-[0_6px_18px_rgba(32,33,36,0.08)]">
+                <h2 class="text-3xl font-bold mb-6 text-center text-slate-900">Create an account</h2>
+                
+                <form action="/signup" method="POST" class="max-w-md mx-auto">
+
+                    <%- include('../partials/errors') %>
+
+
+                    <label for="firstname" class="block text-sm font-medium text-slate-700 mb-2">First Name</label>
+                    <input id="firstname" type="text" name="firstname" value="<%= oldInput && oldInput.firstname ? oldInput.firstname : '' %>" placeholder="First Name" required class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200" />
+
+                    <label for="lastname" class="block text-sm font-medium text-slate-700 mt-4 mb-2">Last Name</label>
+                    <input id="lastname" type="text" name="lastname" value="<%= oldInput.lastname ? oldInput.lastname : '' %>" placeholder="Last Name" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200" />
+
+                    <label for="email" class="block text-sm font-medium text-slate-700 mt-4 mb-2">Email</label>
+                    <input id="email" type="email" name="email" value="<%= oldInput.email ? oldInput.email : '' %>" placeholder="Email" required class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200" />
+
+                    <label for="password" class="block text-sm font-medium text-slate-700 mt-4 mb-2">Password</label>
+                    <input id="password" type="password" name="password" placeholder="Enter your password" required class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200" />
+
+                    <label for="confirmPassword" class="block text-sm font-medium text-slate-700 mt-4 mb-2">Confirm Password</label>
+                    <input id="confirmPassword" type="password" name="confirmPassword" placeholder="Confirm your password" required class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200" />
+                </label>
+
+                    <p class="mt-4 text-sm text-slate-600">Select your user type:</p>
+                    <div class="flex gap-4 mt-2">
+
+                              <label for="host" class="flex items-center gap-2">
+                               <input type="radio" name="usertype" value="host" id="host"
+                                   class="h-4 w-4" <% if (oldInput && oldInput.usertype === 'host') { %>checked<% } %>>
+                               <span class="text-sm text-slate-700">Host</span>
+                              </label>
+
+                              <label for="guest" class="flex items-center gap-2">
+                               <input type="radio" name="usertype" value="guest" id="guest"
+                                   class="h-4 w-4" <% if (oldInput && oldInput.usertype === 'guest') { %>checked<% } %>>
+                               <span class="text-sm text-slate-700">Guest</span>
+                              </label>
+                        
+                    </div>
+                    
+                    </br>
+                    <input type="checkbox" name="terms" id="terms" class="mt-4" required />
+                    <label for="terms" class="text-sm text-slate-600">I agree to the Terms and Conditions
+                    </label>
+
+                    <div class="mt-6">
+                        <button type="submit" class="w-full rounded-2xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300">Signup</button>
+                    </div>
+                </form>
+            </section>
+        </main>
+    </body>
+</html>

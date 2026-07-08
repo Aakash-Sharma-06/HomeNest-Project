@@ -1,0 +1,31 @@
+<%- include('../partials/head') %>
+<%- include('../partials/nav') %>
+
+<body class="bg-blue-50 font-sans text-gray-700">
+    <header class="py-9 px-5 text-center bg-white shadow-md">
+        <h1 class="text-red-700 text-4xl font-bold mb-6">
+            Here is your registered home list
+        </h1>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 max-w-6xl mx-auto px-4">
+            <% registerHome.forEach(home => { %>
+                <div class="bg-white border border-gray-200 rounded-lg overflow-hidden flex flex-col shadow-lg hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300">
+                    <img class="w-full h-44 object-cover" src="<%= home.photo %>" alt="<%= home.houseName %>">
+                    <div class="p-4 flex-1 flex flex-col">
+                        <h2 class="mb-2 text-lg font-semibold text-gray-900"><%= home.houseName %></h2>
+                        <p class="my-1.5 text-sm text-gray-600"><strong>Location:</strong> <%= home.location %></p>
+                        <p class="my-1.5 text-sm text-gray-600"><strong>Price:</strong> <%= home.price %></p>
+                        <p class="my-1.5 text-sm text-gray-600"><strong>Rating</strong> <%= home.rating %></p>
+                        <div class="flex gap-2.5 mt-4">
+                            <a href="/host/edit-home/<%= home._id %>?editing=true" class="px-4 py-2 rounded-lg bg-blue-600 text-white font-bold hover:bg-blue-700 transition-all duration-300 hover:-translate-y-0.5">Edit</a>
+                            <form action="/host/delete-home/<%= home._id %>" method="POST" class="inline">
+                                <button type="submit" class="px-4 py-2 rounded-lg bg-red-500 text-white font-bold hover:bg-red-600 transition-all duration-300 hover:-translate-y-0.5">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </header>
+</body>
+
+</html>

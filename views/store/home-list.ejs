@@ -1,0 +1,26 @@
+<%- include('../partials/head') %>
+<%- include('../partials/nav') %>
+
+<body>
+    <header class="header">
+        <h1 class="page-title">
+            Welcome to HomeNest - Your Ultimate Home Rental Platform
+        </h1>
+        <div class="card-grid">
+            <% registerHome.forEach(home => { %>
+                <div class="home-card">
+                    <h2><%= home.houseName %></h2>
+                    <p><strong>Location:</strong> <%= home.location %></p>
+                    <p><strong>Price:</strong> <%= home.price %></p>
+
+                    <div class="card-actions">
+                        <a class="action-link" href="/homes/<%= home._id %>">Details</a>
+                        <%-include('../partials/favourites',{ home: home })%> 
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </header>
+</body>
+
+</html>
