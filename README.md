@@ -2,7 +2,7 @@
 
 HomeNest is a multi-role, full-stack rental platform built using Node.js, Express, EJS, and Mongoose (MongoDB). 
 
-Rather than just copying features, this project was built to master production-grade backend practices including MVC architecture pattern, relational database designs, session management, secure credential handling, and local storage pipelines.
+HomeNest demonstrates the implementation of modern full-stack web development practices, including MVC architecture, secure authentication, session management, MongoDB integration, Cloudinary-based image storage, and deployment on Render.
 
 ---
 
@@ -31,10 +31,11 @@ Rather than just copying features, this project was built to master production-g
 * **Database:** MongoDB (via Mongoose)
 * **Template Engine:** EJS (Embedded JavaScript)
 * **Styling:** Tailwind CSS (built with a watcher command)
-* **File Uploads:** Multer
+* **File Uploads:** Multer + Cloudinary
 * **Authentication:** Bcryptjs (password hashing)
 * **Session Storage:** express-session, connect-mongodb-session
 * **Environment Variables:** dotenv
+* **Deployment:** Render
 
 ---
 
@@ -53,7 +54,7 @@ Rather than just copying features, this project was built to master production-g
 * `price` (Number, required)
 * `location` (String, required)
 * `rating` (Number, required)
-* `photo` (String path to upload folder)
+* `photo` (String - Cloudinary image URL)
 * `description` (String)
 
 ---
@@ -75,6 +76,10 @@ Create a file named `.env` in the root folder of your project (or copy `.env.exa
 PORT=4000
 MONGO_URI=your_mongodb_connection_uri_here
 SESSION_SECRET=your_session_secret_here
+
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
 ```
 
 > **Note:** The `.env` file is excluded from GitHub using `.gitignore` to keep credentials secure.
@@ -113,3 +118,6 @@ By default, the server will run at: **`http://localhost:4000`**
 * `GET /login` - Login page
 * `POST /login` - Process login & initialize session
 * `POST /logout` - Log out and destroy session
+  
+## Deployment
+The application is deployed on **Render**, with **MongoDB Atlas** as the database and **Cloudinary** for cloud-based image storage.
