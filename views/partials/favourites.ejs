@@ -1,7 +1,6 @@
-<form action="/favourites" method="POST">
-  <button type="submit" style="background-color: #4CAF50; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">
-    Add to Favorite
+<form action="/favourites" method="POST" class="inline">
+  <button type="submit" class="px-4 py-2 rounded-lg bg-green-600 text-white text-sm font-semibold hover:bg-green-700 transition-colors">
+    Add to Favourites
   </button>
   <input type="hidden" name="id" value="<%= home._id %>">
 </form>
-

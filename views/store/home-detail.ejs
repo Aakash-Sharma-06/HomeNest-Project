@@ -1,8 +1,6 @@
 <%- include('../partials/head') %>
 <%- include('../partials/nav') %>
 
-<body>
-
 <body class="bg-gray-100 text-gray-900 min-h-screen">
   <header class="py-9 px-4 text-center">
     <h1 class="text-2xl text-red-700 capitalize tracking-wide mb-4">Here is your detail</h1>
@@ -13,8 +11,11 @@
         <p class="text-sm text-gray-700 mb-2"><strong class="text-gray-900">Location:</strong> <%= home.location %></p>
         <p class="text-sm text-gray-700 mb-2"><strong class="text-gray-900">Price:</strong> <%= home.price %></p>
         <p class="text-sm text-gray-700"><strong class="text-gray-900">Rating:</strong> <%= home.rating %></p>
-        <div class="flex justify-center mt-6">
+        <div class="flex justify-center gap-3 mt-6">
+          <% if (isLoggedIn && user && user.usertype === 'guest') { %>
           <%- include('../partials/favourites', { home: home }) %>
+          <% } %>
+          <a href="/homes" class="px-4 py-2 rounded-lg bg-gray-200 text-gray-800 text-sm font-semibold hover:bg-gray-300 transition-colors">Back to Homes</a>
         </div>
       </div>
     </div>

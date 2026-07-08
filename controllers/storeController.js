@@ -25,38 +25,61 @@ exports.getBookings=(req,res,next)=>{
 }
 
 exports.getFavouriteList= async (req,res,next)=>{
-    const userId=req.session.user._id;
-    const user= await User.findById(userId).populate('favourites');
-    res.render('store/favourite-list',{
-        favouriteHome: user.favourites,
-        pageTitle: 'My Favourite',
-        currentPage:'favourite',
-         isLoggedIn: req.isLoggedIn,
-        user:req.session.user,
-    });
-        
+    try {
+        const userId=req.session.user._id;
+        const user= await User.findById(userId).populate('favourites');
+        if (!user) {
+            return res.redirect("/login");
+        }
+        res.render('store/favourite-list',{
+            favouriteHome: user.favourites,
+            pageTitle: 'My Favourite',
+            currentPage:'favourite',
+            isLoggedIn: req.isLoggedIn,
+            user:req.session.user,
+        });
+    } catch (err) {
+        next(err);
+    }
 }
 
 exports.postAddToFavourite=async (req,res,next)=>{
-    const homeId=req.body.id;
-    const userId=req.session.user._id;
-    const user=await User.findById(userId);
-    if(!user.favourites.includes(homeId)){
-    user.favourites.push(homeId);
-    user.save();
-    }
-
+    try {
+        const homeId=req.body.id;
+        const userId=req.session.user._id;
+        const user=await User.findById(userId);
+        if (!user) {
+            return res.redirect("/login");
+        }
+        const alreadyFavourite = user.favourites.some(
+            (id) => id.toString() === homeId
+        );
+        if (!alreadyFavourite) {
+            user.favourites.push(homeId);
+            await user.save();
+        }
         res.redirect("/favourites");
+    } catch (err) {
+        next(err);
+    }
 }
 
 exports.postRemoveFromFavourite=async (req,res,next)=>{
-  const homeId=req.params.homeId;
-  const userId=req.session.user._id;
-  const user=await User.findById(userId);{
-    user.favourites=user.favourites.filter(fav=> fav!=homeId);
-     await user.save();
-  } 
+    try {
+        const homeId=req.params.homeId;
+        const userId=req.session.user._id;
+        const user=await User.findById(userId);
+        if (!user) {
+            return res.redirect("/login");
+        }
+        user.favourites = user.favourites.filter(
+            (fav) => fav.toString() !== homeId
+        );
+        await user.save();
         res.redirect("/favourites");
+    } catch (err) {
+        next(err);
+    }
 }
  
 exports.getIndex=(req,res,next)=>{
