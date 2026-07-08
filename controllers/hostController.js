@@ -46,23 +46,34 @@ exports.getHostHomes=(req,res,next)=>{
 })
 }
 
-exports.postAddHome= (req,res,next)=>{
-    const {houseName,price,location,rating,description}=req.body;
-    
-    if(!req.file){
-        console.log("NO image provided");
-        return res.status(422).send("No image Provided");
+exports.postAddHome = async (req, res, next) => {
+    try {
+        const { houseName, price, location, rating, description } = req.body;
+
+        if (!req.file) {
+            console.log("NO image provided");
+            return res.status(422).send("No image Provided");
+        }
+
+        const photo = getPhotoUrl(req.file);
+
+        const home = new Home({
+            houseName,
+            price: Number(price),
+            location,
+            rating: Number(rating),
+            photo,
+            description,
+        });
+
+        await home.save();
+        console.log("home Saved success");
+        res.redirect("/host/host-home-list");
+    } catch (err) {
+        console.error("Error adding home:", err);
+        next(err);
     }
-
-    const photo = getPhotoUrl(req.file);
-
-    const home=new Home({houseName,price,location,rating,photo,description});
-    home.save().then(()=>{
-        console.log('home Saved success');
-    });
-
-    res.redirect('/host/host-home-list'); 
-} 
+};
 
 
 exports.postEditHome= (req,res,next)=>{

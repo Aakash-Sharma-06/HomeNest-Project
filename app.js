@@ -70,6 +70,20 @@ app.use("/host",hostRouter);
 
 app.use(errorsController.pageNotFound);
 
+app.use((err, req, res, next) => {
+    console.error("Server error:", err.message || err);
+
+    if (res.headersSent) {
+        return next(err);
+    }
+
+    res.status(500).send(
+        process.env.NODE_ENV === "production"
+            ? "Something went wrong. Check Render logs for details."
+            : err.message || "Internal Server Error"
+    );
+});
+
 const port= process.env.PORT || 4000;
 
 mongoose.connect(DB_path).then(()=>{
