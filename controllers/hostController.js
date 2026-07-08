@@ -1,5 +1,5 @@
 const Home = require("../models/home");
-const fs= require("fs");
+const { getPhotoUrl, deletePhoto } = require("../utils/imageUtil");
 
 
 exports.getAddHome = (req, res, next) => {
@@ -54,7 +54,7 @@ exports.postAddHome= (req,res,next)=>{
         return res.status(422).send("No image Provided");
     }
 
-    const photo=req.file.path;
+    const photo = getPhotoUrl(req.file);
 
     const home=new Home({houseName,price,location,rating,photo,description});
     home.save().then(()=>{
@@ -76,12 +76,10 @@ exports.postEditHome= (req,res,next)=>{
         home.description=description;
 
         if(req.file){
-            fs.unlink(home.photo,(err)=>{
-                if(err){
-                    console.log("Error While deleting File",err);
-                }
+            deletePhoto(home.photo).catch((err) => {
+                console.log("Error while deleting old photo", err);
             });
-            home.photo=req.file.path;
+            home.photo = getPhotoUrl(req.file);
         }
          
         home.save().then(result=>{
