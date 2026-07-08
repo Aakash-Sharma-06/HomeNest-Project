@@ -11,7 +11,7 @@ const DB_path= process.env.MONGO_URI;
 
 
 const storeRouter=require("./routes/storerouter");
-const hostRouter=require("./routes/hostrouter");
+const hostRouter=require("./routes/hostRouter");
 const authRouter=require("./routes/authRouter");
 const rootDir=require("./utils/pathutil");
 const errorsController= require("./controllers/errors");

@@ -3,7 +3,7 @@ const fs= require("fs");
 
 
 exports.getAddHome = (req, res, next) => {
-    res.render('Host/edit-Home',{
+    res.render('Host/edit-home',{
         pageTitle: 'Add Home to Airbnb',
          currentPage: 'addHome',
          editing:false,
@@ -21,7 +21,7 @@ exports.getEditHome = (req, res, next) => {
             console.log("home not found");
             return res.redirect("/host/host-home-list");
         }
-        res.render('Host/edit-Home',{
+        res.render('Host/edit-home',{
         home:home,
         pageTitle: 'Edit Home in Airbnb', 
         currentPage: 'Host-home',
