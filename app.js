@@ -59,13 +59,14 @@ app.use((req, res, next) => {
 app.use(authRouter);
 app.use(storeRouter); 
 app.use("/host",(req,res,next)=>{
-    if(req.isLoggedIn){
-     return next();
+    if(!req.isLoggedIn){
+        return res.redirect("/login");
     }
-    else {
-        res.redirect("/login");
+    if(!req.session.user || req.session.user.usertype !== "host"){
+        return res.redirect("/");
     }
-    });
+    next();
+});
 app.use("/host",hostRouter);
 
 app.use(errorsController.pageNotFound);

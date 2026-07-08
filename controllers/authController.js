@@ -42,10 +42,16 @@ exports.postLogin=async (req,res,next)=>{
         });
     }
 
-    req.session.isLoggedIn=true;
-    req.session.user= JSON.parse(JSON.stringify(user));
+    req.session.isLoggedIn = true;
+    req.session.user = {
+        _id: user._id.toString(),
+        firstname: user.firstname,
+        lastname: user.lastname,
+        email: user.email,
+        usertype: user.usertype,
+    };
     await req.session.save();
-    res.redirect("/");
+    res.redirect(user.usertype === "host" ? "/host/host-home-list" : "/");
 }
 
 
@@ -144,7 +150,7 @@ exports.postSignup=[
 
     bcrypt.hash(password,12).then(hashedPassword =>{
     const user = new User({ firstname, lastname, email, password:hashedPassword, usertype });
-    user.save();
+    return user.save();
     })
     .then(()=>{res.redirect("/login");
     })

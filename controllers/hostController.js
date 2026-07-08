@@ -1,6 +1,9 @@
 const Home = require("../models/home");
 const { getPhotoUrl, deletePhoto } = require("../utils/imageUtil");
 
+function getHostId(req) {
+    return req.session.user?._id;
+}
 
 exports.getAddHome = (req, res, next) => {
     res.render('Host/edit-home',{
@@ -16,10 +19,11 @@ exports.getAddHome = (req, res, next) => {
 exports.getEditHome = (req, res, next) => {
     const homeId=req.params.homeId;
     const editing=req.query.editing=='true';
+    const hostId = getHostId(req);
 
-    Home.findById(homeId).then(home=>{
+    Home.findOne({ _id: homeId, host: hostId }).then(home=>{
         if(!home){
-            console.log("home not found");
+            console.log("home not found for this host");
             return res.redirect("/host/host-home-list");
         }
         res.render('Host/edit-home',{
@@ -30,11 +34,13 @@ exports.getEditHome = (req, res, next) => {
          isLoggedIn: req.isLoggedIn,
         user:req.session.user,
     });
-    })
+    }).catch(err => next(err));
 }
 
 exports.getHostHomes=(req,res,next)=>{
-    Home.find().then(registerHome=>{
+    const hostId = getHostId(req);
+
+    Home.find({ host: hostId }).then(registerHome=>{
         res.render('Host/host-home-list',{
         registerHome: registerHome,
         pageTitle: 'Host-Homes List',
@@ -43,12 +49,17 @@ exports.getHostHomes=(req,res,next)=>{
         user:req.session.user,
         
     })
-})
+}).catch(err => next(err));
 }
 
 exports.postAddHome = async (req, res, next) => {
     try {
+        const hostId = getHostId(req);
         const { houseName, price, location, rating, description } = req.body;
+
+        if (!hostId) {
+            return res.redirect("/login");
+        }
 
         if (!req.file) {
             console.log("NO image provided");
@@ -64,10 +75,11 @@ exports.postAddHome = async (req, res, next) => {
             rating: Number(rating),
             photo,
             description,
+            host: hostId,
         });
 
         await home.save();
-        console.log("home Saved success");
+        console.log("home Saved success for host", hostId);
         res.redirect("/host/host-home-list");
     } catch (err) {
         console.error("Error adding home:", err);
@@ -76,41 +88,47 @@ exports.postAddHome = async (req, res, next) => {
 };
 
 
-exports.postEditHome= (req,res,next)=>{
-    const {id,houseName,price,location,rating,description}=req.body;
+exports.postEditHome= async (req,res,next)=>{
+    try {
+        const hostId = getHostId(req);
+        const {id,houseName,price,location,rating,description}=req.body;
 
-    Home.findById(id).then((home)=>{
-        home.houseName=houseName,
-        home.price=price;
+        const home = await Home.findOne({ _id: id, host: hostId });
+        if (!home) {
+            return res.redirect("/host/host-home-list");
+        }
+
+        home.houseName=houseName;
+        home.price=Number(price);
         home.location=location;
-        home.rating=rating;
+        home.rating=Number(rating);
         home.description=description;
 
         if(req.file){
-            deletePhoto(home.photo).catch((err) => {
+            await deletePhoto(home.photo).catch((err) => {
                 console.log("Error while deleting old photo", err);
             });
             home.photo = getPhotoUrl(req.file);
         }
          
-        home.save().then(result=>{
-        console.log('home update',result);
-        }).catch(err=>{
-            console.log('Error While Updating',err);
-        })
-        res.redirect('/host/host-home-list'); 
-            })
-            .catch(err=>{
-            console.log('Error While finding home',err);
- });
+        await home.save();
+        console.log("home update", home._id);
+        res.redirect("/host/host-home-list");
+    } catch (err) {
+        console.log("Error While Updating", err);
+        next(err);
+    }
 };
 
-exports.postDeleteHome= (req,res,next)=>{
-    const homeId=req.params.homeId;
-    console.log("came ot del",homeId);
-    Home.findByIdAndDelete(homeId).then(()=>{
+exports.postDeleteHome= async (req,res,next)=>{
+    try {
+        const homeId=req.params.homeId;
+        const hostId = getHostId(req);
+
+        await Home.findOneAndDelete({ _id: homeId, host: hostId });
         res.redirect("/host/host-home-list");
-    }).catch(error=>{
-          console.log("Error while delete",error); 
-    })    
+    } catch (error) {
+        console.log("Error while delete", error);
+        next(error);
+    }
 }
