@@ -77,7 +77,6 @@ app.use(session({
 app.use((req, res, next) => {
     // Read from the session instead of req.get('Cookie')
     req.isLoggedIn = req.session ? !!req.session.isLoggedIn : false;
-    // Make isLoggedIn and user available to ALL EJS templates via res.locals
     res.locals.isLoggedIn = req.isLoggedIn;
     res.locals.user = req.session.user || {};
 
